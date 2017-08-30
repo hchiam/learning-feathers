@@ -2,14 +2,37 @@
   <head>
     <title>Example Feathers chat app!</title>
   </head>
-  <body>
+  <body style="margin:100px;">
+
+    <input type="text" placeholder="Message content" id="message" />
+
+    <button onclick="sendMessage();">Send Message!</button>
+
+    <div id="messageList"></div>
+
     <!-- feathers.js: -->
     <script src="//npmcdn.com/feathers-client@2.0.0/dist/feathers.js"></script>
     <!-- give app websockets for real time feel: -->
     <script src="/socket.io/socket.io.js"></script>
+
     <!-- custom script: -->
     <script type="text/javascript">
-      
+      var socket = io();
+      var app = feathers();
+      app.configure(feathers.socketio(socket)); // use socket
+      var messages = app.service('messages');
+
+      messages.on('created',function(msg) {
+        var messageList = document.getElementById('messageList');
+        messageList.innerHTML += "<h4>" + msg.text + "</h4>";
+        console.log("Your message was sent", msg.text);
+      });
+
+      function sendMessage() {
+        var messageValue = document.getElementById("message").value;
+        messages.create({text: messageValue});
+      }
     </script>
+
   </body>
 </html>
